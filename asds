@@ -52,22 +52,6 @@ local function createProcessOverlay()
     loadingBar.Parent = loadingBarBG
 end
 
--- PROGRESS TRACKER
-local function advanceProgress()
-    currentPhase += 1
-    local progress = math.clamp(currentPhase / totalPhases, 0, 1)
-    if loadingBar then
-        loadingBar:TweenSize(UDim2.new(progress, 0, 1, 0), "Out", "Sine", 0.5, true)
-    end
-end
-
-local function destroyOverlay()
-    if guiOverlay then
-        guiOverlay:Destroy()
-        guiOverlay = nil
-    end
-end
-
 --// Constants
 local AUTO_LOOP_DELAY = 0.25
 local RANGE = 5
