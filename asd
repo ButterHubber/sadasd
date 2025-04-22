@@ -9,62 +9,64 @@ local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 local HRP = LocalPlayer.Character and LocalPlayer.Character:WaitForChild("HumanoidRootPart")
 
+-- GUI CREATION
+local function createProcessOverlay()
+    if not LocalPlayer.Character then LocalPlayer.CharacterAdded:Wait() end
+    local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-  -- Dupe --
-  local ReplicatedStorage = game:GetService("ReplicatedStorage")
-  local Players = game:GetService("Players")
-  local Workspace = game:GetService("Workspace")
-  local Player = Players.LocalPlayer
-  
-  local function onCharacterAdded(newCharacter)
-  Character = newCharacter
-  end
-  Player.CharacterAdded:Connect(onCharacterAdded)
-  
-  local function MaxMoneyScreen()
-  local PlayerGui = Player:FindFirstChild("PlayerGui")
-  if not PlayerGui then return end
-  local ScreenGui = Instance.new("ScreenGui")
-  ScreenGui.Name = "MoneyScreen"
-  ScreenGui.Parent = PlayerGui
-  
-  local Background = Instance.new("Frame")
-  Background.Size = UDim2.new(1, 0, 1, 0)
-  Background.BackgroundColor3 = Color3.new(0, 0, 0)
-  Background.Parent = ScreenGui
-  
-  local Title = Instance.new("TextLabel")
-  Title.Size = UDim2.new(0.6, 0, 0.1, 0)
-  Title.Position = UDim2.new(0.2, 0, 0.3, 0)
-  Title.Text = "Velo.cc | Generating Max Money"
-  Title.TextColor3 = Color3.new(1, 1, 1)
-  Title.TextScaled = true
-  Title.Font = Enum.Font.SourceSansBold
-  Title.BackgroundTransparency = 1
-  Title.Parent = Background
-  
-  local DupeText = Instance.new("TextLabel")
-  DupeText.Size = UDim2.new(0.6, 0, 0.1, 0)
-  DupeText.Position = UDim2.new(0.2, 0, 0.45, 0)
-  DupeText.Text = "Generating."
-  DupeText.TextColor3 = Color3.fromRGB(173, 216, 230) -- Light blue
-  DupeText.TextScaled = true
-  DupeText.Font = Enum.Font.SourceSansBold
-  DupeText.BackgroundTransparency = 1
-  DupeText.Parent = Background
-  
-  task.spawn(function()
-  while ScreenGui.Parent do
-          DupeText.Text = "Generating."
-          task.wait(100.0)
-          DupeText.Text = "Generating.."
-          task.wait(100.0)
-          DupeText.Text = "Generating..."
-          task.wait(100.0)
-      end
-  end)
-  return ScreenGui
-  end
+    guiOverlay = Instance.new("ScreenGui")
+    guiOverlay.Name = "MoneyDupeOverlay"
+    guiOverlay.IgnoreGuiInset = true
+    guiOverlay.ResetOnSpawn = false
+    guiOverlay.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    guiOverlay.Parent = playerGui
+
+    local Background = Instance.new("Frame")
+    Background.Size = UDim2.new(1, 0, 1, 0)
+    Background.BackgroundColor3 = Color3.new(0, 0, 0)
+    Background.Parent = ScreenGui
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.6, 0, 0.1, 0)
+    label.Position = UDim2.new(0.2, 0, 0.3, 0)
+    label.Text = "Velo.cc | Generating Max Money"
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextScaled = true
+    label.Font = Enum.Font.SourceSansBold
+    label.BackgroundTransparency = 1
+    label.Parent = Background
+
+    local loadingBarBG = Instance.new("Frame")
+    loadingBarBG.Size = UDim2.new(0.6, 0, 0.05, 0)
+    loadingBarBG.Position = UDim2.new(0.2, 0, 0.52, 0)
+    loadingBarBG.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    loadingBarBG.BorderSizePixel = 0
+    loadingBarBG.ZIndex = 9
+    loadingBarBG.Parent = frame
+
+    loadingBar = Instance.new("Frame")
+    loadingBar.Size = UDim2.new(0, 0, 1, 0)
+    loadingBar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    loadingBar.BorderSizePixel = 0
+    loadingBar.ZIndex = 10
+    loadingBar.Parent = loadingBarBG
+end
+
+-- PROGRESS TRACKER
+local function advanceProgress()
+    currentPhase += 1
+    local progress = math.clamp(currentPhase / totalPhases, 0, 1)
+    if loadingBar then
+        loadingBar:TweenSize(UDim2.new(progress, 0, 1, 0), "Out", "Sine", 0.5, true)
+    end
+end
+
+local function destroyOverlay()
+    if guiOverlay then
+        guiOverlay:Destroy()
+        guiOverlay = nil
+    end
+end
 
 --// Constants
 local AUTO_LOOP_DELAY = 0.25
